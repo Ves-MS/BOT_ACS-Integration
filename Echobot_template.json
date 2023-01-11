@@ -109,17 +109,6 @@
          "minLength":1,
          "defaultValue":"en-US"
       },
-      "searchServiceSku":{
-         "defaultValue":"B (15 indexes)",
-         "allowedValues":[
-            "F (3 indexes)",
-            "B (15 indexes)"
-         ],
-         "type":"String",
-         "metadata":{
-            "description":"The pricing tier for the Azure Search service."
-         }
-      },
       "gitRepoUrl":{
          "type":"string",
          "metadata":{
@@ -143,12 +132,6 @@
       "botAppUrl":"[concat('https://', variables('botAppDomain'))]",
       "hostingPlanName":"[parameters('baseResourceName')]",
       "storageAccountName":"[variables('uniqueString')]",
-      "azureSearchName":"[concat('search-', variables('uniqueString'))]",
-      "azureSearchSkus":{
-         "F ":"free",
-         "B ":"basic"
-      },
-      "azureSearchSkuValue":"[variables('azureSearchSkus')[toUpper(substring(parameters('searchServiceSku'), 0, 2))]]",
       "botAppInsightsName":"[parameters('baseResourceName')]",
       "sharedSkus":[
          "Free",
@@ -194,7 +177,6 @@
          "dependsOn":[
             "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
-            "[resourceId('Microsoft.Search/searchServices/', variables('azureSearchName'))]",
             "[resourceId('Microsoft.Insights/components/', variables('botAppInsightsName'))]"
          ],
          "kind":"app",
@@ -261,18 +243,6 @@
                   {
                      "name":"i18n:SupportedCultures",
                      "value":"en-US"
-                  },
-                  {
-                     "name":"Search:SearchServiceName",
-                     "value":"[variables('azureSearchName')]"
-                  },
-                  {
-                     "name":"Search:SearchServiceAdminApiKey",
-                     "value":"[listAdminKeys(resourceId('Microsoft.Search/searchServices/', variables('azureSearchName')), '2015-08-19').primaryKey]"
-                  },
-                  {
-                     "name":"Search:SearchServiceQueryApiKey",
-                     "value":"[listQueryKeys(resourceId('Microsoft.Search/searchServices/', variables('azureSearchName')), '2015-08-19').value[0].key]"
                   },
                   {
                      "name":"WEBSITE_NODE_DEFAULT_VERSION",
@@ -383,23 +353,6 @@
             "name":"F0"
          },
          "type":"Microsoft.BotService/botServices"
-      },
-      {
-         "type":"Microsoft.Search/searchServices",
-         "apiVersion":"2015-08-19",
-         "name":"[variables('azureSearchName')]",
-         "location":"[parameters('location')]",
-         "tags":{
-            "isqnamaker":"true"
-         },
-         "sku":{
-            "name":"[toLower(variables('azureSearchSkuValue'))]"
-         },
-         "properties":{
-            "replicaCount":1,
-            "partitionCount":1,
-            "hostingMode":"default"
-         }
       },
       {
          "apiVersion":"2019-04-01",
